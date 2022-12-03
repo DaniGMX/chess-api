@@ -45,12 +45,10 @@ func parseMoveCounters(fen string, board *Board, p *int) {
 	if err != nil {
 		log.Fatal(err)
 	}
-
 	fullMoveCounter, err := strconv.Atoi(moves[1])
 	if err != nil {
 		log.Fatal(err)
 	}
-
 	board.HalfMoveClock, board.FullMoveNumber = halfMoveClock, fullMoveCounter
 }
 
