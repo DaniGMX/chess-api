@@ -7,8 +7,8 @@ import (
 )
 
 type Board struct {
-	Bitboards      []bitboard
-	Occupancies    []bitboard
+	Bitboards      []Bitboard
+	Occupancies    []Bitboard
 	Side           int
 	OpenEnpassant  int
 	OpenCastlings  int
@@ -20,8 +20,8 @@ func ParseFEN(fen string) *Board {
 	var board Board
 	p := 0
 
-	board.Bitboards = make([]bitboard, 12)
-	board.Occupancies = make([]bitboard, 3)
+	board.Bitboards = make([]Bitboard, 12)
+	board.Occupancies = make([]Bitboard, 3)
 	board.Side = White
 	board.OpenEnpassant = NoSquare
 	board.OpenCastlings = 0
@@ -66,13 +66,13 @@ func parseOpenCastlings(fen string, board *Board, p *int) {
 	for fen[*p] != ' ' {
 		switch fen[*p] {
 		case 'K':
-			board.OpenCastlings |= WKC
+			board.OpenCastlings |= WKSC
 		case 'Q':
-			board.OpenCastlings |= WQC
+			board.OpenCastlings |= WQSC
 		case 'k':
-			board.OpenCastlings |= BKC
+			board.OpenCastlings |= BKSC
 		case 'q':
-			board.OpenCastlings |= BQC
+			board.OpenCastlings |= BQSC
 		case '-':
 		}
 		*p++
@@ -105,7 +105,7 @@ func parsePiecePlacement(fen string, board *Board, p *int) {
 				offset := (int)(fen[*p] - '0')
 				piece := NoPiece
 				for b := WP; b < BK; b++ {
-					if !emptyBitboard(getBit(board.Bitboards[b], square)) {
+					if !isZero(getBit(board.Bitboards[b], square)) {
 						piece = b
 					}
 				}
