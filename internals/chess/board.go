@@ -105,7 +105,7 @@ func parsePiecePlacement(fen string, board *Board, p *int) {
 				offset := (int)(fen[*p] - '0')
 				piece := NoPiece
 				for b := WP; b < BK; b++ {
-					if !isZero(getBit(board.Bitboards[b], square)) {
+					if !isZero64(getBit(board.Bitboards[b], square)) {
 						piece = b
 					}
 				}
