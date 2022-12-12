@@ -7,8 +7,8 @@ import (
 )
 
 type Board struct {
-	Bitboards      []uint64
-	Occupancies    []uint64
+	Bitboards      []bitboard
+	Occupancies    []bitboard
 	Side           int
 	OpenEnpassant  int
 	OpenCastlings  int
@@ -20,8 +20,8 @@ func ParseFEN(fen string) *Board {
 	var board Board
 	p := 0
 
-	board.Bitboards = make([]uint64, 12)
-	board.Occupancies = make([]uint64, 3)
+	board.Bitboards = make([]bitboard, 12)
+	board.Occupancies = make([]bitboard, 3)
 	board.Side = White
 	board.OpenEnpassant = NoSquare
 	board.OpenCastlings = 0
@@ -98,14 +98,14 @@ func parsePiecePlacement(fen string, board *Board, p *int) {
 			square := rank*8 + file
 			if (fen[*p] >= 'a' && fen[*p] <= 'z') || (fen[*p] >= 'A' && fen[*p] <= 'Z') {
 				piece := PieceFromChar[fen[*p]]
-				SetBit(&board.Bitboards[piece], square)
+				setBit(&board.Bitboards[piece], square)
 				*p++
 			}
 			if fen[*p] >= '0' && fen[*p] <= '9' {
 				offset := (int)(fen[*p] - '0')
 				piece := NoPiece
 				for b := WP; b < BK; b++ {
-					if !EmptyBitboard(GetBit(board.Bitboards[b], square)) {
+					if !emptyBitboard(getBit(board.Bitboards[b], square)) {
 						piece = b
 					}
 				}
@@ -128,4 +128,12 @@ func parsePiecePlacement(fen string, board *Board, p *int) {
 
 	board.Occupancies[Both] = board.Occupancies[White] | board.Occupancies[Black]
 	*p++
+}
+
+func saveBoard() {
+
+}
+
+func loadBoard() {
+
 }

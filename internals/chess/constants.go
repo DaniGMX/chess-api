@@ -1,7 +1,7 @@
 package chess
 
 const (
-	A8 int = iota
+	A8 square = iota
 	B8
 	C8
 	D8
@@ -69,25 +69,25 @@ const (
 )
 
 const (
-	WKC int = 1
-	WQC int = 2
-	BKC int = 4
-	BQC int = 8
+	WKC castling = 1
+	WQC castling = 2
+	BKC castling = 4
+	BQC castling = 8
 )
 
 const (
-	White int = iota
+	White color = iota
 	Black
 	Both
 )
 
 const (
-	Rook int = iota
+	Rook piece = iota
 	Bishop
 )
 
 const (
-	WP int = iota
+	WP piece = iota
 	WN
 	WB
 	WR
