@@ -1,32 +1,35 @@
 package api
 
 import (
+	"log"
 	"net/http"
 
-	handlers "github.com/danigmx/chess-api/cmd/server/api/handlers"
+	"github.com/danigmx/chess-api/cmd/server/api/handlers"
 )
 
 type Server struct {
-	listenAddress string
+	port string
+	mux  *http.ServeMux
 
-	boardHandler *handlers.BoardHandler
+	boardsHandler *handlers.BoardsHandler
+	gamesHandler  *handlers.GamesHandler
 }
 
-func NewServer(listenAddress string) *Server {
+func NewServer(port string) *Server {
 	return &Server{
-		listenAddress: listenAddress,
-		boardHandler:  handlers.NewBoardHandler(),
+		port:          port,
+		mux:           http.NewServeMux(),
+		boardsHandler: handlers.NewBoardHandler(),
+		gamesHandler:  handlers.NewGameHandler(),
 	}
 }
 
-func (s *Server) Start() error {
-	http.HandleFunc("/", s.handleRoot)
-	http.HandleFunc(s.boardHandler.RootURI, s.handleBoard)
-	return http.ListenAndServe(s.listenAddress, nil)
-}
+func (s *Server) Start() {
+	s.mux.HandleFunc("/boards/", s.boardsHandler.Handle)
 
-func (s *Server) handleRoot(w http.ResponseWriter, r *http.Request) {}
-
-func (s *Server) handleBoard(w http.ResponseWriter, r *http.Request) {
-	s.boardHandler.Handle(w, r)
+	server := &http.Server{
+		Addr:    s.port,
+		Handler: s.mux,
+	}
+	log.Fatal(server.ListenAndServe())
 }

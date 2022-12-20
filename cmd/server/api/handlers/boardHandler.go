@@ -1,39 +1,39 @@
-package handler
+package handlers
 
 import (
 	"fmt"
 	"net/http"
+	"strings"
+
+	"github.com/danigmx/chess-api/cmd/server/api/utils"
 )
 
-type BoardHandler struct {
+type BoardsHandler struct {
 	RootURI string
 }
 
-const (
-	boardRootURI = "/boards"
-)
-
-func NewBoardHandler() *BoardHandler {
-	return &BoardHandler{
-		RootURI: boardRootURI,
-	}
+func NewBoardHandler() *BoardsHandler {
+	return &BoardsHandler{}
 }
 
-func (bh *BoardHandler) Handle(w http.ResponseWriter, r *http.Request) {
-	method := r.Method
+func (bh *BoardsHandler) Handle(writer http.ResponseWriter, request *http.Request) {
+	method := request.Method
 
 	switch method {
 	case http.MethodGet:
-		get(w, r)
+		bh.get(writer, request)
 	case http.MethodPost:
-		post(w, r)
+		bh.post(writer, request)
+	default:
+		http.NotFound(writer, request)
 	}
 }
 
-func post(w http.ResponseWriter, r *http.Request) {
-fmt.Println("POST /boards")
+func (bh *BoardsHandler) get(responseWriter http.ResponseWriter, request *http.Request) {
+	fen := strings.TrimPrefix(request.URL.Path, "/boards/")
+	utils.CheckRegexFen(fen)
 }
 
-func get(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("Hello word from /board")
+func (bh *BoardsHandler) post(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("POST /boards")
 }

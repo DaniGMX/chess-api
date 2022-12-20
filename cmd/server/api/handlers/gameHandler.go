@@ -1,15 +1,8 @@
-package handler
+package handlers
 
-type GameHandler struct {
-	RootUri string
+type GamesHandler struct {
 }
 
-const (
-	gameRootURI = "/board"
-)
-
-func NewGameHandler() *GameHandler {
-	return &GameHandler{
-		RootUri: gameRootURI,
-	}
+func NewGameHandler() *GamesHandler {
+	return &GamesHandler{}
 }
