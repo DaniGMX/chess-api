@@ -57,8 +57,10 @@ func parseOpenEnpassant(fen string, board *Board, p *int) {
 		file := (int)(fen[*p] - 'a')
 		rank := 8 - (int)(fen[*p+1]-'0')
 		board.OpenEnpassant = rank*8 + file
+		*p += 3
 	} else {
 		board.OpenEnpassant = NoSquare
+		*p += 2
 	}
 }
 
@@ -94,27 +96,28 @@ func parseSideToPlay(fen string, board *Board, p *int) {
 
 func parsePiecePlacement(fen string, board *Board, p *int) {
 	for rank := 0; rank < 8; rank++ {
-		for file := 0; file < 8; rank++ {
-			square := rank*8 + file
+		for file := 0; file < 8; file++ {
+			square := (8 * rank) + file
 			if (fen[*p] >= 'a' && fen[*p] <= 'z') || (fen[*p] >= 'A' && fen[*p] <= 'Z') {
 				piece := PieceFromChar[fen[*p]]
-				setBit(&board.Bitboards[piece], square)
+				SetBit(&board.Bitboards[piece], square)
 				*p++
 			}
 			if fen[*p] >= '0' && fen[*p] <= '9' {
 				offset := (int)(fen[*p] - '0')
-				piece := NoPiece
+				piece := -1
 				for b := WP; b < BK; b++ {
-					if !isZero64(getBit(board.Bitboards[b], square)) {
+					if !IsZero64(GetBit(board.Bitboards[b], square)) {
 						piece = b
 					}
 				}
-				if piece == NoPiece {
+				if piece == -1 {
 					file--
 				}
 				file += offset
 				*p++
 			}
+
 			if fen[*p] == '/' {
 				*p++
 			}

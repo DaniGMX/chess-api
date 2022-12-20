@@ -236,7 +236,7 @@ func initializeSliderAttacks() {
 		rookMasks[square] = rookAttackMaskForSquare(square)
 
 		bishopAttackMask, rookAttackMask := bishopMasks[square], rookMasks[square]
-		bishopRelevantBitsCount, rookRelevantBitsCount := countBits(bishopAttackMask), countBits(rookAttackMask)
+		bishopRelevantBitsCount, rookRelevantBitsCount := CountBits(bishopAttackMask), CountBits(rookAttackMask)
 		bishopOccupancyIndices, rookOccupancyIndices := (1 << bishopRelevantBitsCount), (1 << rookRelevantBitsCount)
 
 		for index := 0; index < bishopOccupancyIndices; index++ {
@@ -257,20 +257,20 @@ func pawnAttackMaskForSideAndSquare(side Color, square Square) Bitboard {
 	var panwAttacks Bitboard = 0
 	var pawn Bitboard = 0
 
-	setBit(&pawn, square)
+	SetBit(&pawn, square)
 
 	if side == White {
-		if !isZero64((pawn >> 7) & notFileA) {
+		if !IsZero64((pawn >> 7) & notFileA) {
 			panwAttacks |= (pawn >> 7)
 		}
-		if !isZero64((pawn >> 9) & notFileH) {
+		if !IsZero64((pawn >> 9) & notFileH) {
 			panwAttacks |= (pawn >> 9)
 		}
 	} else {
-		if !isZero64((pawn >> 7) & notFileA) {
+		if !IsZero64((pawn >> 7) & notFileA) {
 			panwAttacks |= (pawn >> 7)
 		}
-		if !isZero64((pawn >> 9) & notFileH) {
+		if !IsZero64((pawn >> 9) & notFileH) {
 			panwAttacks |= (pawn >> 9)
 		}
 	}
@@ -281,31 +281,31 @@ func pawnAttackMaskForSideAndSquare(side Color, square Square) Bitboard {
 func knightAttackMaskForSquare(square Square) Bitboard {
 	var knightAttacks Bitboard = 0
 	var knight Bitboard = 0
-	setBit(&knight, square)
+	SetBit(&knight, square)
 
-	if !isZero64((knight >> 17) & notFileH) {
+	if !IsZero64((knight >> 17) & notFileH) {
 		knightAttacks |= (knight >> 17)
 	}
-	if !isZero64((knight >> 15) & notFileH) {
+	if !IsZero64((knight >> 15) & notFileH) {
 		knightAttacks |= (knight >> 15)
 	}
-	if !isZero64((knight >> 10) & notFileH) {
+	if !IsZero64((knight >> 10) & notFileH) {
 		knightAttacks |= (knight >> 10)
 	}
-	if !isZero64((knight >> 6) & notFileH) {
+	if !IsZero64((knight >> 6) & notFileH) {
 		knightAttacks |= (knight >> 6)
 	}
 
-	if !isZero64((knight << 17) & notFileH) {
+	if !IsZero64((knight << 17) & notFileH) {
 		knightAttacks |= (knight << 17)
 	}
-	if !isZero64((knight << 15) & notFileH) {
+	if !IsZero64((knight << 15) & notFileH) {
 		knightAttacks |= (knight << 15)
 	}
-	if !isZero64((knight << 10) & notFileH) {
+	if !IsZero64((knight << 10) & notFileH) {
 		knightAttacks |= (knight << 10)
 	}
-	if !isZero64((knight << 6) & notFileH) {
+	if !IsZero64((knight << 6) & notFileH) {
 		knightAttacks |= (knight << 6)
 	}
 
@@ -315,31 +315,31 @@ func knightAttackMaskForSquare(square Square) Bitboard {
 func kingAttackMasForSquare(square Square) Bitboard {
 	var kingAttacks Bitboard = 0
 	var king Bitboard = 0
-	setBit(&king, square)
+	SetBit(&king, square)
 
-	if !isZero64(king >> 8) {
+	if !IsZero64(king >> 8) {
 		kingAttacks |= (king >> 8)
 	}
-	if !isZero64((king >> 9) & notFileH) {
+	if !IsZero64((king >> 9) & notFileH) {
 		kingAttacks |= (king >> 9)
 	}
-	if !isZero64((king >> 7) & notFileA) {
+	if !IsZero64((king >> 7) & notFileA) {
 		kingAttacks |= (king >> 7)
 	}
-	if !isZero64((king >> 1) & notFileH) {
+	if !IsZero64((king >> 1) & notFileH) {
 		kingAttacks |= (king >> 1)
 	}
 
-	if !isZero64(king << 8) {
+	if !IsZero64(king << 8) {
 		kingAttacks |= (king << 8)
 	}
-	if !isZero64((king << 9) & notFileA) {
+	if !IsZero64((king << 9) & notFileA) {
 		kingAttacks |= (king << 9)
 	}
-	if !isZero64((king << 7) & notFileH) {
+	if !IsZero64((king << 7) & notFileH) {
 		kingAttacks |= (king << 7)
 	}
-	if !isZero64((king << 1) & notFileA) {
+	if !IsZero64((king << 1) & notFileA) {
 		kingAttacks |= (king << 1)
 	}
 
@@ -349,7 +349,7 @@ func kingAttackMasForSquare(square Square) Bitboard {
 func bishopAttackMaskForSquare(square Square) Bitboard {
 	var bishopAttacks Bitboard = 0
 	var bishop Bitboard = 0
-	setBit(&bishop, square)
+	SetBit(&bishop, square)
 
 	tr, tf := square/8, square%8
 
@@ -372,7 +372,7 @@ func bishopAttackMaskForSquare(square Square) Bitboard {
 func rookAttackMaskForSquare(square Square) Bitboard {
 	var rookAttacks Bitboard = 0
 	var rook Bitboard = 0
-	setBit(&rook, square)
+	SetBit(&rook, square)
 
 	tr, tf := square/8, square%8
 
@@ -413,7 +413,7 @@ func queenAttackMaskForSquareAndOccupancy(square Square, occupancy Bitboard) Bit
 
 func bishopRealTimeAttackMask(square Square, occupancy Bitboard) Bitboard {
 	var bishop Bitboard = 0
-	setBit(&bishop, square)
+	SetBit(&bishop, square)
 	var realTimeBishopAttacks Bitboard = 0
 	tr, tf := square/8, square%8
 
@@ -447,7 +447,7 @@ func bishopRealTimeAttackMask(square Square, occupancy Bitboard) Bitboard {
 
 func rookRealTimeAttacksMask(square Square, occupancy Bitboard) Bitboard {
 	var rook Bitboard = 0
-	setBit(&rook, square)
+	SetBit(&rook, square)
 	var realTimeRookAttacks Bitboard = 0
 	tr, tf := square/8, square%8
 
@@ -483,8 +483,8 @@ func setOccupancy(index, maskBitCount int, attacks Bitboard) Bitboard {
 	var occupancy Bitboard = 0
 
 	for count := 0; count < maskBitCount; count++ {
-		square := lsb(attacks)
-		popBit(&attacks, square)
+		square := LSB(attacks)
+		PopBit(&attacks, square)
 
 		if index&(1<<count) != 0 {
 			occupancy |= (1 << square)

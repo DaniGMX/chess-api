@@ -1,11 +1,14 @@
 package handlers
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"strings"
 
 	"github.com/danigmx/chess-api/cmd/server/api/utils"
+	"github.com/danigmx/chess-api/pkg/chess"
+	"github.com/danigmx/chess-api/pkg/types"
 )
 
 type BoardsHandler struct {
@@ -31,7 +34,13 @@ func (bh *BoardsHandler) Handle(writer http.ResponseWriter, request *http.Reques
 
 func (bh *BoardsHandler) get(responseWriter http.ResponseWriter, request *http.Request) {
 	fen := strings.TrimPrefix(request.URL.Path, "/boards/")
-	utils.CheckRegexFen(fen)
+	fen = strings.ReplaceAll(fen, "_", " ")
+	if utils.CheckRegexFen(fen) {
+		board := types.BoardStateFromChessBoard(chess.ParseFEN(fen))
+		responseWriter.WriteHeader(http.StatusOK)
+		responseWriter.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(responseWriter).Encode(board)
+	}
 }
 
 func (bh *BoardsHandler) post(w http.ResponseWriter, r *http.Request) {

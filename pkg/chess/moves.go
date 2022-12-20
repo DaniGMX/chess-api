@@ -19,12 +19,12 @@ func generateMovesForPiece(b *Board, p Piece) []Move {
 	var source, target Square
 	bitboard := b.Bitboards[p]
 
-	for !isZero64(bitboard) {
-		source = lsb(bitboard)
+	for !IsZero64(bitboard) {
+		source = LSB(bitboard)
 		attacks := pieceAttacks(b, p, source)
 
-		for !isZero64(attacks) {
-			target = lsb(attacks)
+		for !IsZero64(attacks) {
+			target = LSB(attacks)
 			var occupancies uint64
 
 			if b.Side == White {
@@ -33,14 +33,14 @@ func generateMovesForPiece(b *Board, p Piece) []Move {
 				occupancies = b.Occupancies[Black]
 			}
 
-			if isZero64(getBit(occupancies, target)) {
+			if IsZero64(GetBit(occupancies, target)) {
 				moves = append(moves, encodeMove(source, target, p, 0, false, false, false, false))
 			}
 
-			popBit(&attacks, target)
+			PopBit(&attacks, target)
 		}
 
-		popBit(&bitboard, source)
+		PopBit(&bitboard, source)
 	}
 
 	return moves
@@ -60,8 +60,8 @@ func generatePawnMoves(board *Board, pawn Piece, bitboard Bitboard) []Move {
 		opponent = White
 	}
 
-	for !isZero64(bitboard) {
-		source := lsb(bitboard)
+	for !IsZero64(bitboard) {
+		source := LSB(bitboard)
 		var target Square
 
 		if board.Side == White {
@@ -73,9 +73,9 @@ func generatePawnMoves(board *Board, pawn Piece, bitboard Bitboard) []Move {
 		var canQuietMove bool
 
 		if board.Side == White {
-			canQuietMove = !(target < A8) && isZero64(getBit(board.Occupancies[Both], target))
+			canQuietMove = !(target < A8) && IsZero64(GetBit(board.Occupancies[Both], target))
 		} else {
-			canQuietMove = !(target < A8) && isZero64(getBit(board.Occupancies[Both], target))
+			canQuietMove = !(target < A8) && IsZero64(GetBit(board.Occupancies[Both], target))
 		}
 
 		if canQuietMove {
@@ -99,9 +99,9 @@ func generatePawnMoves(board *Board, pawn Piece, bitboard Bitboard) []Move {
 
 				if board.Side == White {
 					target -= 8
-					canDoublePawnPush = source >= A2 && source <= H2 && isZero64(getBit(board.Occupancies[Both], target))
+					canDoublePawnPush = source >= A2 && source <= H2 && IsZero64(GetBit(board.Occupancies[Both], target))
 				} else {
-					canDoublePawnPush = source >= A7 && source <= H7 && isZero64(getBit(board.Occupancies[Both], target))
+					canDoublePawnPush = source >= A7 && source <= H7 && IsZero64(GetBit(board.Occupancies[Both], target))
 
 				}
 
@@ -113,8 +113,8 @@ func generatePawnMoves(board *Board, pawn Piece, bitboard Bitboard) []Move {
 
 		attacks := pawnAttacks[board.Side][source] & board.Occupancies[opponent]
 
-		for !isZero64(attacks) {
-			target := lsb(attacks)
+		for !IsZero64(attacks) {
+			target := LSB(attacks)
 
 			var isPromotion bool
 
@@ -133,19 +133,19 @@ func generatePawnMoves(board *Board, pawn Piece, bitboard Bitboard) []Move {
 				moves = append(moves, encodeMove(source, target, pawn, 0, true, false, false, false))
 			}
 
-			popBit(&attacks, target)
+			PopBit(&attacks, target)
 		}
 
 		if board.OpenEnpassant != NoSquare {
 			openEnpassantAttackMask := pawnAttacks[board.Side][source] & (1 << board.OpenEnpassant)
 
-			if !isZero64(openEnpassantAttackMask) {
-				target := lsb(openEnpassantAttackMask)
+			if !IsZero64(openEnpassantAttackMask) {
+				target := LSB(openEnpassantAttackMask)
 				moves = append(moves, encodeMove(source, target, pawn, 0, true, false, true, false))
 			}
 		}
 
-		popBit(&bitboard, source)
+		PopBit(&bitboard, source)
 	}
 
 	return moves
@@ -158,20 +158,20 @@ func generateCastlingMoves(board *Board, king Piece) []Move {
 	var source, kingSideTarget, queenSideTarget Square
 
 	if board.Side == White {
-		openKingSideCastle = !isZero(board.OpenCastlings & WKSC)
-		openQueenSideCastle = !isZero(board.OpenCastlings & WQSC)
-		kingSideConnected = !isZero64(getBit(board.Occupancies[Both], F1)) && !isZero64(getBit(board.Occupancies[Both], G1))
-		queenSideConnected = !isZero64(getBit(board.Occupancies[Both], B1)) && !isZero64(getBit(board.Occupancies[Both], C1))
+		openKingSideCastle = !IsZero(board.OpenCastlings & WKSC)
+		openQueenSideCastle = !IsZero(board.OpenCastlings & WQSC)
+		kingSideConnected = !IsZero64(GetBit(board.Occupancies[Both], F1)) && !IsZero64(GetBit(board.Occupancies[Both], G1))
+		queenSideConnected = !IsZero64(GetBit(board.Occupancies[Both], B1)) && !IsZero64(GetBit(board.Occupancies[Both], C1))
 		safeKingSide = IsSquareAttacked(board, E1, Black) && !IsSquareAttacked(board, F1, Black)
 		safeKingSide = IsSquareAttacked(board, E1, Black) && !IsSquareAttacked(board, D1, Black)
 		source = E1
 		kingSideTarget = G1
 		queenSideTarget = C1
 	} else {
-		openKingSideCastle = !isZero(board.OpenCastlings & BKSC)
-		openQueenSideCastle = !isZero(board.OpenCastlings & BQSC)
-		kingSideConnected = !isZero64(getBit(board.Occupancies[Both], F8)) && !isZero64(getBit(board.Occupancies[Both], G8))
-		queenSideConnected = !isZero64(getBit(board.Occupancies[Both], B8)) && !isZero64(getBit(board.Occupancies[Both], C8))
+		openKingSideCastle = !IsZero(board.OpenCastlings & BKSC)
+		openQueenSideCastle = !IsZero(board.OpenCastlings & BQSC)
+		kingSideConnected = !IsZero64(GetBit(board.Occupancies[Both], F8)) && !IsZero64(GetBit(board.Occupancies[Both], G8))
+		queenSideConnected = !IsZero64(GetBit(board.Occupancies[Both], B8)) && !IsZero64(GetBit(board.Occupancies[Both], C8))
 		safeKingSide = IsSquareAttacked(board, E8, Black) && !IsSquareAttacked(board, F8, Black)
 		safeKingSide = IsSquareAttacked(board, E8, Black) && !IsSquareAttacked(board, D8, Black)
 		source = E8
@@ -194,12 +194,12 @@ func generatePieceMoves(board *Board, piece Piece, bitboard Bitboard) []Move {
 
 	var source, target Square
 
-	for !isZero64(bitboard) {
-		source = lsb(bitboard)
+	for !IsZero64(bitboard) {
+		source = LSB(bitboard)
 		attacks := pieceAttacks(board, piece, source)
 
-		for !isZero64(attacks) {
-			target = lsb(attacks)
+		for !IsZero64(attacks) {
+			target = LSB(attacks)
 
 			var occupancies Bitboard
 
@@ -209,16 +209,16 @@ func generatePieceMoves(board *Board, piece Piece, bitboard Bitboard) []Move {
 				occupancies = board.Occupancies[White]
 			}
 
-			if isZero64(getBit(occupancies, target)) {
+			if IsZero64(GetBit(occupancies, target)) {
 				moves = append(moves, encodeMove(source, target, piece, 0, false, false, false, false))
 			} else {
 				moves = append(moves, encodeMove(source, target, piece, 0, true, false, false, false))
 			}
 
-			popBit(&attacks, target)
+			PopBit(&attacks, target)
 		}
 
-		popBit(&bitboard, source)
+		PopBit(&bitboard, source)
 	}
 
 	return moves
